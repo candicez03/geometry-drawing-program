@@ -16,6 +16,31 @@ class GeometryDrawingProgram {
   public static JFrame frame;
   public static ArrayList<Shape2D> shapes;
 
+  public static final String[] COMMAND_PROMPTS = new String[] {
+    "Display all Shapes to console",
+    "Add a single Shape",
+    "Remove a single Shape",
+    "Translate a single Shape",
+    "Rotate a single Shape",
+    "Translate entire drawing",
+    "Rotate entire drawing",
+    "Save drawing to a file",
+    "Load Drawing from a file",
+    "Quit"
+  };
+
+  public static final String[] CONSTRUCTIBLE_SHAPES = new String[] {
+    "ellipse",
+    "circle",
+    "simple polygon",
+    "triangle",
+    "quadrilateral",
+    "parallelogram",
+    "trapezoid",
+    "rectangle",
+    "rhombus",
+    "square"
+  };
   public static void main(String[] args) {  
     GeometryScreen geoScreen = new GeometryScreen();
     Scanner input = new Scanner(System.in);
@@ -70,12 +95,12 @@ class GeometryDrawingProgram {
         //Note - These coordinates are not based on the x/y axis
                   
         g.drawOval(50,100, 25,50);        
-        Color myCol = new Color(200,120,50); // You can creat your only colors based on RGB
+        Color myCol = new Color(200,120,50); // You can create your only colors based on RGB
         g.setColor(myCol);
         g.drawRect(300,200,50,100);
             
         //You will need to draw each of the Shapes contained in your Arraylist here
-        //This screen will update everytime the menu loop completes
+        //This screen will update every time the menu loop completes
 
       }
 

@@ -1,6 +1,8 @@
 import java.awt.Point;
 
 public class SimplePolygon extends Polygon {
+  private static final String TYPE = "simple polygon";
+
   public SimplePolygon(Point... vertices) {
     super(vertices);
   }
@@ -19,5 +21,10 @@ public class SimplePolygon extends Polygon {
       area +=  x1*y2 - y1*x2;
     }
     return Math.abs(area/2);
+  }
+
+  @Override
+  public String getType() {
+    return SimplePolygon.TYPE;
   }
 }
