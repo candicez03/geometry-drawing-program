@@ -1,3 +1,5 @@
+package src.main.java;
+
 import java.awt.Graphics;
 
 public abstract class Shape2D implements Drawable, Rotatable, Translatable {

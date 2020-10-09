@@ -1,3 +1,5 @@
+package src.main.java;
+
 public class Circle extends Ellipse {
   private static final String TYPE = "circle";
 

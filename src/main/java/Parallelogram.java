@@ -1,3 +1,5 @@
+package src.main.java;
+
 import java.awt.Point;
 
 public class Parallelogram extends Quadrilateral {

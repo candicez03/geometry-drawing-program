@@ -1,8 +1,4 @@
-/**
- * 
- * @author Candice Zhang
- * @version 1.0
- */
+package src.main.java;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -11,6 +7,13 @@ import java.awt.Color;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+/**
+ * GeometryDrawingProgram
+ * @version 1.0
+ * @author Candice Zhang
+ * 2020.10.04
+ */
 
 class GeometryDrawingProgram {
   public static JFrame frame;

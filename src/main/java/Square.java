@@ -1,3 +1,5 @@
+package src.main.java;
+
 public class Square extends Rectangle {
   private static final String TYPE = "square";
 
