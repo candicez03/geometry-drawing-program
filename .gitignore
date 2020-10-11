@@ -1,4 +1,7 @@
 
 *.json
 *.vscode
-*.violet.html
+planning/
+docs/
+saves/
+.vscode/

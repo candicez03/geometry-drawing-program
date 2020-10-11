@@ -15,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
 /**
@@ -26,8 +27,13 @@ import java.nio.file.Paths;
 
 class GeometryDrawingProgram {
   public static JFrame frame;
-  public static ArrayList<Shape2D> shape2Ds;
+  public static ArrayList<Shape2D> shapes;
   
+  public static final String FILE_EXTENSION = ".geo";
+  public static final String SAVING_FOLDER  = "saves/";
+  public static final String LEGAL_FILENAME_CHARS =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.";
+
   public static final String[] COMMANDS = new String[] {
     "Display all Shapes to console",
     "Add a single Shape",
@@ -41,7 +47,7 @@ class GeometryDrawingProgram {
     "Quit"
   };
 
-  public static final String[] CONSTRUCTIBLE_SHAPE2DS = new String[] {
+  public static final String[] CONSTRUCTIBLE_SHAPES = new String[] {
     "ellipse",
     "circle",
     "simple polygon",
@@ -105,9 +111,13 @@ class GeometryDrawingProgram {
     "base width"
   };
 
+  
+  /** 
+   * @param args
+   */
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
-    shape2Ds = new ArrayList<Shape2D>();
+    shapes = new ArrayList<Shape2D>();
     String menu_options = toNumberedString(COMMANDS);
     String inputPromptMsg = "Please enter an integer to select one of the options from the menu.";
     int commandIdx = -1;
@@ -131,18 +141,23 @@ class GeometryDrawingProgram {
     input.close();
   }
   
+  
+  /** 
+   * @param input
+   * @param commandIdx
+   */
   public static void handleCommand(Scanner input, int commandIdx) {
     switch(commandIdx) {
     // Display all Shapes to console
     case 0:
-      if (shape2Ds.isEmpty()) {
+      if (shapes.isEmpty()) {
         System.out.println("There are currently no shapes in this drawing.");
       } else {
-        for (int i = 0; i < shape2Ds.size(); i++) {
+        for (int i = 0; i < shapes.size(); i++) {
           System.out.printf(
             "%d) %s\n",
             i+1,
-            shape2Ds.get(i).toString());
+            shapes.get(i).toString());
         }
       }
       break;
@@ -150,8 +165,8 @@ class GeometryDrawingProgram {
     // Add a single Shape
     case 1:
       try {
-        Shape2D newShape2D = generateShape2DFromInput(input);
-        shape2Ds.add(newShape2D);
+        Shape2D newShape = generateShape2DFromInput(input);
+        shapes.add(newShape);
       } catch (InvalidShapeException e) {
         System.out.println(e.getMessage());
       }
@@ -159,65 +174,65 @@ class GeometryDrawingProgram {
 
     // Remove a single Shape
     case 2:
-      if (shape2Ds.isEmpty()) {
+      if (shapes.isEmpty()) {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
         System.out.println("Displaying info of all shapes...");
-        for (Shape2D shape: shape2Ds) {
+        for (Shape2D shape: shapes) {
           System.out.println(shape.toString());
         }
         System.out.print("Enter the index of the shape you would like to remove: ");
-        int idxToRemove = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
-        shape2Ds.remove(idxToRemove);
+        int idxToRemove = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
+        shapes.remove(idxToRemove);
       }
       break;
 
     // Translate a single Shape
     case 3:
-      if (shape2Ds.isEmpty()) {
+      if (shapes.isEmpty()) {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
         System.out.println("Displaying info of all shapes...");
-        for (Shape2D shape: shape2Ds) {
+        for (Shape2D shape: shapes) {
           System.out.println(shape.toString());
         }
 
         System.out.print("Enter the index of the shape you would like to translate: ");
-        int idxToTranslate = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
+        int idxToTranslate = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
         System.out.print("x value of translation: ");
         int x = getIntFromInput(input);
         System.out.print("y value of translation: ");
         int y = getIntFromInput(input);
 
-        shape2Ds.get(idxToTranslate).translate(x, y);
+        shapes.get(idxToTranslate).translate(x, y);
       }
       break;
     
     // Rotate a single Shape
     case 4:
-      if (shape2Ds.isEmpty()) {
+      if (shapes.isEmpty()) {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
         System.out.println("Displaying info of all shapes...");
-        for (Shape2D shape: shape2Ds) {
+        for (Shape2D shape: shapes) {
           System.out.println(shape.toString());
         }
 
         System.out.print("Enter the index of the shape you would like to rotate: ");
-        int idxToRotate = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
+        int idxToRotate = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
         System.out.print("Enter the degree of rotation, clockwise: ");
         int angle = getIntFromInput(input);
 
-        shape2Ds.get(idxToRotate).rotateClockwise(angle);
+        shapes.get(idxToRotate).rotateClockwise(angle);
       }
       break;
 
     // Translate entire drawing
     case 5:
-      if (shape2Ds.isEmpty()) {
+      if (shapes.isEmpty()) {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
@@ -226,7 +241,7 @@ class GeometryDrawingProgram {
         System.out.print("y value of translation: ");
         int y = getIntFromInput(input);
 
-        for (Shape2D shape: shape2Ds) {
+        for (Shape2D shape: shapes) {
           shape.translate(x, y);
         }
       }
@@ -234,13 +249,13 @@ class GeometryDrawingProgram {
 
     // Rotate entire drawing
     case 6:
-      if (shape2Ds.isEmpty()) {
+      if (shapes.isEmpty()) {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
         System.out.print("Enter the degree of rotation, clockwise: ");
         int angle = getIntFromInput(input);
-        for (Shape2D shape: shape2Ds) {
+        for (Shape2D shape: shapes) {
           shape.rotateClockwise(angle);
         }
       }
@@ -249,24 +264,33 @@ class GeometryDrawingProgram {
     // Save drawing to a file
     case 7:
       System.out.print("Enter the name of the file: ");
-      String fileInPath = input.nextLine();
+      String fileInName = input.nextLine();
+      if (!isLegalFileName(fileInName)) {
+        System.out.println("File name contains illegal characters.");
+        break;
+      }
+
+      String fileInPath = SAVING_FOLDER + fileInName + FILE_EXTENSION;
 
       if(Files.exists(Paths.get(fileInPath))) { 
         System.out.print("This file already exists. Enter 'y' to overwrite: ");
         String choice = input.nextLine();
         if (!choice.equals("y")) {
+          System.out.println("Saving aborted");
           break;
         }
       }
-
+      
       try {
         FileOutputStream file = new FileOutputStream(fileInPath);
         ObjectOutputStream outputStream = new ObjectOutputStream(file);
-        outputStream.writeObject(shape2Ds);
+        outputStream.writeObject(shapes);
         outputStream.close();
         file.close();
         System.out.println("Successfully saved");
-
+      
+      } catch (InvalidPathException e) {
+        System.out.println("e.getReason()");
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -275,7 +299,14 @@ class GeometryDrawingProgram {
     // Load Drawing from a file
     case 8:
       System.out.print("Enter the name of the file: ");
-      String fileOutPath = input.nextLine();
+      String fileOutName = input.nextLine();
+      if (!isLegalFileName(fileOutName)) {
+        System.out.println("File name contains illegal characters.");
+        break;
+      }
+
+      String fileOutPath = SAVING_FOLDER + fileOutName + FILE_EXTENSION;
+      
       if(Files.notExists(Paths.get(fileOutPath))) { 
         System.out.println("File does not exist!");
         break;
@@ -284,8 +315,8 @@ class GeometryDrawingProgram {
       try {
         FileInputStream file = new FileInputStream(fileOutPath);
         ObjectInputStream inputStream = new ObjectInputStream(file);
-        ArrayList<Shape2D> newShape2Ds = (ArrayList<Shape2D>)(inputStream.readObject());
-        shape2Ds = newShape2Ds;
+        ArrayList<Shape2D> newShapes = (ArrayList<Shape2D>)(inputStream.readObject());
+        shapes = newShapes;
         inputStream.close();
         file.close();
         System.out.println("Successfully loaded");
@@ -304,20 +335,24 @@ class GeometryDrawingProgram {
     }    
   }
 
+  
+  /** 
+   * @param input
+   * @return Shape2D
+   * @throws InvalidShapeException
+   */
   public static Shape2D generateShape2DFromInput(Scanner input)
     throws InvalidShapeException {
 
     Shape2D shape2DToReturn = null;
-    String shape2DOptionsMsg = toNumberedString(CONSTRUCTIBLE_SHAPE2DS);
+    String shape2DOptionsMsg = toNumberedString(CONSTRUCTIBLE_SHAPES);
 
     System.out.println("Please select one of the shapes to generate:");
     System.out.println(shape2DOptionsMsg);
     
-    int shapeTypeIdx = getIntInRangeFromInput(input, 1, CONSTRUCTIBLE_SHAPE2DS.length) - 1;
+    int shapeTypeIdx = getIntInRangeFromInput(input, 1, CONSTRUCTIBLE_SHAPES.length) - 1;
     
     String[] prompts;
-    String line;
-    int intInput;
     switch(shapeTypeIdx) {
     // ellipse
     case 0:
@@ -362,7 +397,14 @@ class GeometryDrawingProgram {
 
         simplePolygonArgs[i] = new Point(x, y);
       }
-      shape2DToReturn = new SimplePolygon(simplePolygonArgs);
+      try {
+        shape2DToReturn = new SimplePolygon(simplePolygonArgs);
+      } catch (IllegalArgumentException e) {
+        throw new InvalidShapeException(
+          "The given points do not form a simple polygon.",
+          shape2DToReturn
+        );
+      }
       break;
 
     // triangle
@@ -486,12 +528,22 @@ class GeometryDrawingProgram {
       break;
     }
 
-    if (!Shape2D.isValidShape2D(shape2DToReturn)) {
-      throw new InvalidShapeException(shape2DToReturn);
+    if (!Shape2D.isValidShape(shape2DToReturn)) {
+      throw new InvalidShapeException(
+        "Invalid shape. The area/perimeter of the constructed shape is 0.",
+        shape2DToReturn
+      );
     }
     return shape2DToReturn;
   }
 
+  
+  /** 
+   * @param input
+   * @param min
+   * @param max
+   * @return int
+   */
   public static int getIntInRangeFromInput(Scanner input, int min, int max) {
     int userInt = getIntFromInput(input);
     while (!isInRange(userInt, min, max)) {
@@ -504,6 +556,11 @@ class GeometryDrawingProgram {
     return userInt;
   }
 
+  
+  /** 
+   * @param input
+   * @return int
+   */
   public static int getIntFromInput(Scanner input) {
     String userInput = input.nextLine();
     while (!isInteger(userInput)) {
@@ -513,6 +570,11 @@ class GeometryDrawingProgram {
     return Integer.valueOf(userInput);
   }
 
+  
+  /** 
+   * @param strings
+   * @return String
+   */
   public static String toNumberedString(String[] strings) {
     String result = "";
     for (int i = 0; i < strings.length; i++) {
@@ -521,6 +583,20 @@ class GeometryDrawingProgram {
     return result.trim();
   }
 
+  public static boolean isLegalFileName(String fileName) {
+    for (int i = 0; i < fileName.length(); i++) {
+      String cur = fileName.substring(i, i+1);
+      if (LEGAL_FILENAME_CHARS.indexOf(cur) == -1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** 
+   * @param str
+   * @return boolean
+   */
   public static boolean isInteger(String str) {
     if (str == null) {
       return false;
@@ -548,6 +624,13 @@ class GeometryDrawingProgram {
     return true;
   }
 
+  
+  /** 
+   * @param number
+   * @param min
+   * @param max
+   * @return boolean
+   */
   public static boolean isInRange(int number, int min, int max) {
     return (number >= min) && (number <= max);
   }
@@ -580,10 +663,10 @@ class GeometryDrawingProgram {
 
         this.drawAxis(g);
         
-        if (!shape2Ds.isEmpty()) {
+        if (!shapes.isEmpty()) {
           g.translate(xOffset, yOffset);
-          for(int i = 0; i < shape2Ds.size(); i++) {
-            shape2Ds.get(i).draw((Graphics2D)g);
+          for(int i = 0; i < shapes.size(); i++) {
+            shapes.get(i).draw((Graphics2D)g);
           }
           g.translate(-xOffset, yOffset); // reset translations
         }

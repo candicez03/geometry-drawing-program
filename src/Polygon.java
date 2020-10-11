@@ -2,17 +2,29 @@ import java.awt.Point;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
-public abstract class Polygon extends Shape2D {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
+/**
+ * Represents a polygon by a finite number of vertices
+ * that are connected by straight line segments.
+ * @since 1.0
+ * @version 1.0
+ * @author Candice Zhang
+ */
 
+public abstract class Polygon extends Shape2D {
+  /** The serial version ID used for serialization. */
+  private static final long serialVersionUID = 1L;
+  /** The string representation of the {@code Polygon} class's type. */
   private static final String TYPE = "polygon";
 
+  /** The array that stores the x coordinates of the vertices. */
   private int[] xPoints;
+  /** The array that stores the y coordinates of the vertices. */
   private int[] yPoints;
 
+  /**
+   * Constructs a new {@code Polygon} with a given set of vertices.
+   * @param vertices  A array of vertex points of the polygon.
+   */
   public Polygon(Point... vertices) {
     super();
     this.xPoints = new int[vertices.length];
@@ -24,19 +36,24 @@ public abstract class Polygon extends Shape2D {
     this.updatePerimeter();
   }
 
-  @Override
-  public void translate(int dx, int dy) {
-    for (int i = 0; i < this.xPoints.length; i++) {
-      this.xPoints[i] += dx;
-      this.yPoints[i] += dy;
-    }
-  }
-  
+  /** 
+   * Returns the string representation of
+   * the {@code Polygon} class's type.
+   * @return String, the type of the {@code Polygon}.
+   */
   @Override
   public String getType() {
     return Polygon.TYPE;
   }
 
+  
+  /** 
+   * Returns a {@code String} representation of the {@code Polygon}.
+   * <p>
+   * Includes: type, area, perimeter, rotation angle,
+   * coordinates of vertices.
+   * @return String, a representation of the {@code Polygon}.
+   */
   @Override
   public String toString() {
     String additionalInfo = "Points: [";
@@ -63,6 +80,14 @@ public abstract class Polygon extends Shape2D {
   }
 
   @Override
+  public void translate(int dx, int dy) {
+    for (int i = 0; i < this.xPoints.length; i++) {
+      this.xPoints[i] += dx;
+      this.yPoints[i] += dy;
+    }
+  }
+  
+  @Override
   public void draw(Graphics2D g2d) {
     if (this.getRotationAngle() == 0) {
       g2d.drawPolygon(this.xPoints, this.yPoints, this.xPoints.length);
@@ -79,10 +104,20 @@ public abstract class Polygon extends Shape2D {
     g2d.setTransform(transformCopy);
   }
 
+  
+  /** 
+   * Returns an array of the x coordinates of the vertices.
+   * @return int[], an array of the x coordinates of the vertices.
+   */
   public int[] getXPoints() {
     return this.xPoints;
   }
 
+  
+  /** 
+   * Returns an array of the y coordinates of the vertices.
+   * @return int[], an array of the y coordinates of the vertices.
+   */
   public int[] getYPoints() {
     return this.yPoints;
   }
