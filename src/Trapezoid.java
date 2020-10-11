@@ -1,15 +1,6 @@
 import java.awt.Point;
 
 public class Trapezoid extends Quadrilateral {
-  public static final String[] PROMPTS = new String[] {
-    "x coordinate (top-left)",
-    "y coordinate (top-right)",
-    "x coordinate (bottom-left)",
-    "y coordinate (bottom-right)",
-    "top length",
-    "bottom length"
-  };
-
   /**
    *
    */

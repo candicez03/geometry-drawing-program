@@ -1,12 +1,6 @@
 import java.awt.Point;
 
 public class Rectangle extends Parallelogram {
-  public static final String[] PROMPTS = new String[] {
-    "x coordinate (top-left)",
-    "y coordinate (top-left)",
-    "width",
-    "height"
-  };
 
   /**
    *
@@ -15,19 +9,15 @@ public class Rectangle extends Parallelogram {
 
   private static final String TYPE = "rectangle";
 
-  private int x;
-  private int y;
   private int width;
   private int height;
 
-  public Rectangle(int x, int y, int width, int height) {
+  public Rectangle(Point topLeft, int width, int height) {
     super(
-      new Point(x, y),
-      new Point(x, y+height),
+      topLeft,
+      new Point(topLeft.x, topLeft.y+height),
       width
     );
-    this.x = x;
-    this.y = y;
     this.width = width;
     this.height = height;
   }
@@ -41,8 +31,8 @@ public class Rectangle extends Parallelogram {
   public String toString() {
     String additionalInfo = String.format(
       "location: (%d, %d)\twidth: %d, height: %d",
-      this.x,
-      this.y,
+      this.getTopLeft().x,
+      this.getTopLeft().y,
       this.width,
       this.height
     );
@@ -59,12 +49,8 @@ public class Rectangle extends Parallelogram {
     return 2 * (this.width + this.height);
   }
 
-  public int getX() {
-    return this.x;
-  }
-
-  public int getY() {
-    return this.y;
+  public Point getTopLeft() {
+    return new Point(this.getXPoints()[0], this.getYPoints()[0]);
   }
 
   public int getWidth() {

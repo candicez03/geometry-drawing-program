@@ -3,12 +3,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 public abstract class Polygon extends Shape2D {
-  public static final String[] PROMPTS = new String[] {
-    "number of points",
-    "x coordinate",
-    "y coordinate"
-  };
-
   /**
    *
    */
@@ -31,16 +25,10 @@ public abstract class Polygon extends Shape2D {
   }
 
   @Override
-  public void translateX(int value) {
+  public void translate(int dx, int dy) {
     for (int i = 0; i < this.xPoints.length; i++) {
-      this.xPoints[i] += value;
-    }
-  }
-
-  @Override
-  public void translateY(int value) {
-    for (int i = 0; i < this.yPoints.length; i++) {
-      this.yPoints[i] += value;
+      this.xPoints[i] += dx;
+      this.yPoints[i] += dy;
     }
   }
   
@@ -82,7 +70,11 @@ public abstract class Polygon extends Shape2D {
     }
 
     AffineTransform transformCopy = g2d.getTransform();
-    g2d.rotate(Math.toRadians(-this.getRotationAngle()));
+    g2d.rotate(
+      Math.toRadians(this.getRotationAngle()),
+      this.xPoints[0],
+      this.yPoints[0]
+    );
     g2d.drawPolygon(this.xPoints, this.yPoints, this.xPoints.length);
     g2d.setTransform(transformCopy);
   }

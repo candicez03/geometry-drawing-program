@@ -53,14 +53,64 @@ class GeometryDrawingProgram {
     "rhombus",
     "square"
   };
+
+  public static final String[] PROMPTS_ELLIPSE = new String[] {
+    "x (top-left)",
+    "y (top-left)",
+    "width",
+    "height"
+  };
   
+  public static final String[] PROMPTS_CIRCLE = new String[] {
+    "x (top-left)",
+    "y (top-left)",
+    "diameter",
+  };
+
+  public static final String[] PROMPTS_PARALLELOGRAM = new String[] {
+    "x (top-left)",
+    "y (top-left)",
+    "x (bottom-left)",
+    "y (bottom-left)",
+    "base width"
+  };
+
+  public static final String[] PROMPTS_RECTANGLE = new String[] {
+    "x (top-left)",
+    "y (top-left)",
+    "width",
+    "height"
+  };
+
+  public static final String[] PROMPTS_RHOMBUS = new String[] {
+    "x (top-left)",
+    "y (top-left)",
+    "x (bottom-left)",
+    "y (bottom-left)"
+  };
+
+  public static final String[] PROMPTS_SQUARE = new String[] {
+    "x (top-left)",
+    "y (top-left)",
+    "side length"
+  };
+
+  
+  public static final String[] PROMPTS_TRAPEZOID = new String[] {
+    "x (top-left)",
+    "y (top-right)",
+    "x (bottom-left)",
+    "y (bottom-right)",
+    "top width",
+    "base width"
+  };
+
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
     shape2Ds = new ArrayList<Shape2D>();
     String menu_options = toNumberedString(COMMANDS);
     String inputPromptMsg = "Please enter an integer to select one of the options from the menu.";
-    String userInput;
-    int userChoice = -1;
+    int commandIdx = -1;
     
     System.out.println("Welcome to Geometry Drawing Program 1.0!");
 
@@ -69,26 +119,16 @@ class GeometryDrawingProgram {
     do {
       frame.repaint(); //update the screen
 
-      System.out.println(inputPromptMsg);
+      System.out.println("\n" + inputPromptMsg);
       System.out.println(menu_options);
       
-      userInput = input.nextLine();
-      if (!isInteger(userInput)) {
-        System.out.println("Invalid input! not a number. " + inputPromptMsg);
-      } else {
-        userChoice = Integer.valueOf(userInput) - 1;
-        if (isInRange(userChoice, 0, COMMANDS.length-1)) {
-          handleCommand(input, userChoice);
-        } else {
-          System.out.println("Invalid input! number not in range. " + inputPromptMsg);
-        }
-      }
-    } while(userChoice != COMMANDS.length-1);
+      commandIdx = getIntInRangeFromInput(input, 1, COMMANDS.length) - 1;
+      handleCommand(input, commandIdx);
+
+    } while(commandIdx != COMMANDS.length-1);
 
     frame.dispose();
     input.close();
-
-    System.out.println("bye");
   }
   
   public static void handleCommand(Scanner input, int commandIdx) {
@@ -112,8 +152,6 @@ class GeometryDrawingProgram {
       try {
         Shape2D newShape2D = generateShape2DFromInput(input);
         shape2Ds.add(newShape2D);
-      } catch (IllegalArgumentException e) {
-        System.out.println("IllegalArgumentException");
       } catch (InvalidShapeException e) {
         System.out.println(e.getMessage());
       }
@@ -129,16 +167,9 @@ class GeometryDrawingProgram {
         for (Shape2D shape: shape2Ds) {
           System.out.println(shape.toString());
         }
-
-        System.out.println("Enter the index of the shape you would like to remove: ");
-        try {
-          int idxToRemove = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
-          shape2Ds.remove(idxToRemove);
-        } catch (NumberFormatException e) {
-          System.out.println("NumberFormatException");
-        } catch (IntNotInRangeException e) {
-          System.out.println("IntNotInRangeException");
-        }        
+        System.out.print("Enter the index of the shape you would like to remove: ");
+        int idxToRemove = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
+        shape2Ds.remove(idxToRemove);
       }
       break;
 
@@ -153,25 +184,14 @@ class GeometryDrawingProgram {
           System.out.println(shape.toString());
         }
 
-        try {
-          System.out.println("Enter the index of the shape you would like to translate: ");
-          int idxToTranslate = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
-          int x;
-          int y;
+        System.out.print("Enter the index of the shape you would like to translate: ");
+        int idxToTranslate = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
+        System.out.print("x value of translation: ");
+        int x = getIntFromInput(input);
+        System.out.print("y value of translation: ");
+        int y = getIntFromInput(input);
 
-          System.out.println("Enter the x value of translation");
-          x = getIntInRangeFromInput(input, Integer.MIN_VALUE, Integer.MAX_VALUE);
-          System.out.println("Enter the y value of translation");
-          y = getIntInRangeFromInput(input, Integer.MIN_VALUE, Integer.MAX_VALUE);
-
-          shape2Ds.get(idxToTranslate).translateX(x);
-          shape2Ds.get(idxToTranslate).translateY(y);
-
-        } catch (NumberFormatException e) {
-          System.out.println("NumberFormatException");
-        } catch (IntNotInRangeException e) {
-          System.out.println("IntNotInRangeException");
-        }        
+        shape2Ds.get(idxToTranslate).translate(x, y);
       }
       break;
     
@@ -186,20 +206,12 @@ class GeometryDrawingProgram {
           System.out.println(shape.toString());
         }
 
-        try {
-          System.out.println("Enter the index of the shape you would like to rotate: ");
-          int idxToRotate = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
-          int angle;
-          System.out.println("Enter the degree of rotation, clockwise:");
-          angle = getIntInRangeFromInput(input, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        System.out.print("Enter the index of the shape you would like to rotate: ");
+        int idxToRotate = getIntInRangeFromInput(input, 1, shape2Ds.size()) - 1;
+        System.out.print("Enter the degree of rotation, clockwise: ");
+        int angle = getIntFromInput(input);
 
-          shape2Ds.get(idxToRotate).rotateClockwise(angle);
-          
-        } catch (NumberFormatException e) {
-          System.out.println("NumberFormatException");
-        } catch (IntNotInRangeException e) {
-          System.out.println("IntNotInRangeException");
-        }        
+        shape2Ds.get(idxToRotate).rotateClockwise(angle);
       }
       break;
 
@@ -209,24 +221,14 @@ class GeometryDrawingProgram {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
-        try {
-          int x;
-          int y;
-          System.out.println("Enter the x value of translation");
-          x = getIntInRangeFromInput(input, Integer.MIN_VALUE, Integer.MAX_VALUE);
-          System.out.println("Enter the y value of translation");
-          y = getIntInRangeFromInput(input, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        System.out.print("x value of translation: ");
+        int x = getIntFromInput(input);
+        System.out.print("y value of translation: ");
+        int y = getIntFromInput(input);
 
-          for (Shape2D shape: shape2Ds) {
-            shape.translateX(x);
-            shape.translateY(y);
-          }
-          
-        } catch (NumberFormatException e) {
-          System.out.println("NumberFormatException");
-        } catch (IntNotInRangeException e) {
-          System.out.println("IntNotInRangeException");
-        }        
+        for (Shape2D shape: shape2Ds) {
+          shape.translate(x, y);
+        }
       }
       break;
 
@@ -236,27 +238,26 @@ class GeometryDrawingProgram {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
-        try {
-          int angle;
-          System.out.println("Enter the degree of rotation, clockwise:");
-          angle = getIntInRangeFromInput(input, Integer.MIN_VALUE, Integer.MAX_VALUE);
-
-          for (Shape2D shape: shape2Ds) {
-            shape.rotateClockwise(angle);
-          }
-          
-        } catch (NumberFormatException e) {
-          System.out.println("NumberFormatException");
-        } catch (IntNotInRangeException e) {
-          System.out.println("IntNotInRangeException");
-        }        
+        System.out.print("Enter the degree of rotation, clockwise: ");
+        int angle = getIntFromInput(input);
+        for (Shape2D shape: shape2Ds) {
+          shape.rotateClockwise(angle);
+        }
       }
       break;
 
     // Save drawing to a file
     case 7:
-      System.out.println("Enter the name of the file");
+      System.out.print("Enter the name of the file: ");
       String fileInPath = input.nextLine();
+
+      if(Files.exists(Paths.get(fileInPath))) { 
+        System.out.print("This file already exists. Enter 'y' to overwrite: ");
+        String choice = input.nextLine();
+        if (!choice.equals("y")) {
+          break;
+        }
+      }
 
       try {
         FileOutputStream file = new FileOutputStream(fileInPath);
@@ -264,14 +265,16 @@ class GeometryDrawingProgram {
         outputStream.writeObject(shape2Ds);
         outputStream.close();
         file.close();
+        System.out.println("Successfully saved");
+
       } catch (IOException e) {
-        System.out.println("IOException");
+        e.printStackTrace();
       }
       break;
     
     // Load Drawing from a file
     case 8:
-      System.out.println("Enter the name of the file");
+      System.out.print("Enter the name of the file: ");
       String fileOutPath = input.nextLine();
       if(Files.notExists(Paths.get(fileOutPath))) { 
         System.out.println("File does not exist!");
@@ -285,122 +288,80 @@ class GeometryDrawingProgram {
         shape2Ds = newShape2Ds;
         inputStream.close();
         file.close();
+        System.out.println("Successfully loaded");
+
       } catch (IOException e) {
         e.printStackTrace();
       } catch (ClassNotFoundException e) {
-        System.out.println("ClassNotFoundException");
+        e.printStackTrace();
       }
       break;
     
     // Quit
     case 9:
+      System.out.println("Bye!");
       break;
     }    
   }
 
   public static Shape2D generateShape2DFromInput(Scanner input)
-    throws IllegalArgumentException,
-           InvalidShapeException {
+    throws InvalidShapeException {
+
     Shape2D shape2DToReturn = null;
     String shape2DOptionsMsg = toNumberedString(CONSTRUCTIBLE_SHAPE2DS);
+
     System.out.println("Please select one of the shapes to generate:");
     System.out.println(shape2DOptionsMsg);
-    int shapeTypeIdx = -1;
     
-    try {
-      shapeTypeIdx = getIntInRangeFromInput(input, 1, CONSTRUCTIBLE_SHAPE2DS.length) - 1;
-    } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("", e);
-    } catch (IntNotInRangeException e) {
-      throw new IllegalArgumentException("", e);
-    }
+    int shapeTypeIdx = getIntInRangeFromInput(input, 1, CONSTRUCTIBLE_SHAPE2DS.length) - 1;
     
     String[] prompts;
     String line;
+    int intInput;
     switch(shapeTypeIdx) {
     // ellipse
     case 0:
-      prompts = Ellipse.PROMPTS;
+      prompts = PROMPTS_ELLIPSE;
       int[] ellipseArgs = new int[prompts.length];
       for (int i = 0; i < prompts.length; i++) {
-        System.out.print("Enter the " + prompts[i] + " of the ellipse: ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          ellipseArgs[i] = Integer.valueOf(line);
-        }
+        System.out.print(prompts[i] + ": ");
+        ellipseArgs[i] = getIntFromInput(input);
       }
-      try {
-        shape2DToReturn = new Ellipse(
-          ellipseArgs[0],
-          ellipseArgs[1],
-          ellipseArgs[2],
-          ellipseArgs[3]
-        );
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("", e);
-      }
+      shape2DToReturn = new Ellipse(
+        new Point(ellipseArgs[0], ellipseArgs[1]),
+        ellipseArgs[2],
+        ellipseArgs[3]
+      );
       break;
 
     // circle
     case 1:
-      prompts = Circle.PROMPTS;
+      prompts = PROMPTS_CIRCLE;
       int[] circleArgs = new int[prompts.length];
       for (int i = 0; i < prompts.length; i++) {
-        System.out.print("Enter the " + prompts[i] + " of the circle: ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          circleArgs[i] = Integer.valueOf(line);
-        }
+        System.out.print(prompts[i] + ": ");
+        circleArgs[i] = getIntFromInput(input);
       }
-      try {
-        shape2DToReturn = new Circle(
-          circleArgs[0],
-          circleArgs[1],
-          circleArgs[2]
-        );
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("", e);
-      }
+      shape2DToReturn = new Circle(
+        new Point(circleArgs[0], circleArgs[1]),
+        circleArgs[2]
+      );
       break;
 
     // simple polygon
     case 2:
-      System.out.print("Enter the number of points the simple polygon has: ");
-      int nPoints;
-      try {
-        nPoints = getIntInRangeFromInput(input, 3, Integer.MAX_VALUE);
-      } catch (NumberFormatException e) {
-        throw e;
-      } catch (IntNotInRangeException e) {
-        throw new IllegalArgumentException("", e);
-      }
-
+      System.out.print("number of points: ");
+      int nPoints = getIntInRangeFromInput(input, 3, Integer.MAX_VALUE);
       Point[] simplePolygonArgs = new Point[nPoints];
-      for (int i = 0; i < nPoints; i++) {
-        int x, y;
-        System.out.print("Enter the x coordinate of point " + Integer.toString(i+1) + ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          x = Integer.valueOf(line);
-        }
 
-        System.out.print("Enter the y coordinate of point " + Integer.toString(i+1) + ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          y = Integer.valueOf(line);
-        }
+      for (int i = 0; i < nPoints; i++) {
+        System.out.print("x of point " + Integer.toString(i+1) + ": ");
+        int x = getIntFromInput(input);
+        System.out.print("y of point " + Integer.toString(i+1) + ": ");
+        int y = getIntFromInput(input);
 
         simplePolygonArgs[i] = new Point(x, y);
       }
-
       shape2DToReturn = new SimplePolygon(simplePolygonArgs);
       break;
 
@@ -409,26 +370,13 @@ class GeometryDrawingProgram {
       Point[] triangleArgs = new Point[3];
 
       for (int i = 0; i < 3; i++) {
-        int x, y;
-        System.out.print("Enter the x coordinate of point " + Integer.toString(i+1) + ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          x = Integer.valueOf(line);
-        }
-
-        System.out.print("Enter the y coordinate of point " + Integer.toString(i+1) + ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          y = Integer.valueOf(line);
-        }
+        System.out.print("x of point " + Integer.toString(i+1) + ": ");
+        int x = getIntFromInput(input);
+        System.out.print("y of point " + Integer.toString(i+1) + ": ");
+        int y = getIntFromInput(input);
 
         triangleArgs[i] = new Point(x, y);
       }
-
       shape2DToReturn = new Triangle(
         triangleArgs[0],
         triangleArgs[1],
@@ -441,26 +389,13 @@ class GeometryDrawingProgram {
       Point[] quadrilateralArgs = new Point[4];
 
       for (int i = 0; i < 4; i++) {
-        int x, y;
-        System.out.print("Enter the x coordinate of point " + Integer.toString(i+1) + ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          x = Integer.valueOf(line);
-        }
-
-        System.out.print("Enter the y coordinate of point " + Integer.toString(i+1) + ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          y = Integer.valueOf(line);
-        }
+        System.out.print("x of point " + Integer.toString(i+1) + ": ");
+        int x = getIntFromInput(input);
+        System.out.print("y of point " + Integer.toString(i+1) + ": ");
+        int y = getIntFromInput(input);
 
         quadrilateralArgs[i] = new Point(x, y);
       }
-
       shape2DToReturn = new Quadrilateral(
         quadrilateralArgs[0],
         quadrilateralArgs[1],
@@ -471,20 +406,13 @@ class GeometryDrawingProgram {
 
     // parallelogram
     case 5:
-      prompts = Parallelogram.PROMPTS;
+      prompts = PROMPTS_PARALLELOGRAM;
       int[] parallelogramArgs = new int[prompts.length];
 
       for (int i = 0; i < prompts.length; i++) {
-        System.out.print("Enter the " + prompts[i]+ ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          parallelogramArgs[i] = Integer.valueOf(line);
-        }
+        System.out.print(prompts[i] + ": ");
+        parallelogramArgs[i] = getIntFromInput(input);
       }
-
-
       shape2DToReturn = new Parallelogram(
         new Point (parallelogramArgs[0], parallelogramArgs[1]),
         new Point (parallelogramArgs[2], parallelogramArgs[3]),
@@ -495,19 +423,13 @@ class GeometryDrawingProgram {
 
     // trapezoid
     case 6:
-      prompts = Trapezoid.PROMPTS;
+      prompts = PROMPTS_TRAPEZOID;
       int[] trapezoidArgs = new int[prompts.length];
 
       for (int i = 0; i < prompts.length; i++) {
-        System.out.print("Enter the " + prompts[i]+ ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          trapezoidArgs[i] = Integer.valueOf(line);
-        }
+        System.out.print(prompts[i] + ": ");
+        trapezoidArgs[i] = getIntFromInput(input);
       }
-
       shape2DToReturn = new Trapezoid(
         new Point (trapezoidArgs[0], trapezoidArgs[1]),
         new Point (trapezoidArgs[2], trapezoidArgs[3]),
@@ -518,22 +440,16 @@ class GeometryDrawingProgram {
 
     // rectangle
     case 7:
-      prompts = Rectangle.PROMPTS;
+      prompts = PROMPTS_RECTANGLE;
       int[] rectangleArgs = new int[prompts.length];
 
       for (int i = 0; i < prompts.length; i++) {
-        System.out.print("Enter the " + prompts[i]+ ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          rectangleArgs[i] = Integer.valueOf(line);
-        }
+        System.out.print(prompts[i] + ": ");
+        rectangleArgs[i] = getIntFromInput(input);
       }
 
       shape2DToReturn = new Rectangle(
-        rectangleArgs[0],
-        rectangleArgs[1],
+        new Point(rectangleArgs[0], rectangleArgs[1]),
         rectangleArgs[2],
         rectangleArgs[3]
       );
@@ -541,19 +457,13 @@ class GeometryDrawingProgram {
 
     // rhombus
     case 8:
-      prompts = Rhombus.PROMPTS;
+      prompts = PROMPTS_RHOMBUS;
       int[] rhombusArgs = new int[prompts.length];
 
       for (int i = 0; i < prompts.length; i++) {
-        System.out.print("Enter the " + prompts[i]+ ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          rhombusArgs[i] = Integer.valueOf(line);
-        }
+        System.out.print(prompts[i] + ": ");
+        rhombusArgs[i] = getIntFromInput(input);
       }
-
       shape2DToReturn = new Rhombus(
         new Point(rhombusArgs[0], rhombusArgs[1]),
         new Point(rhombusArgs[2], rhombusArgs[3])
@@ -562,47 +472,45 @@ class GeometryDrawingProgram {
 
     // square
     case 9:
-      prompts = Square.PROMPTS;
+      prompts = PROMPTS_SQUARE;
       int[] squareArgs = new int[prompts.length];
 
       for (int i = 0; i < prompts.length; i++) {
-        System.out.print("Enter the " + prompts[i]+ ": ");
-        line = input.nextLine();
-        if (!isInteger(line)) {
-          throw new NumberFormatException();
-        } else {
-          squareArgs[i] = Integer.valueOf(line);
-        }
+        System.out.print(prompts[i] + ": ");
+        squareArgs[i] = getIntFromInput(input);
       }
-
       shape2DToReturn = new Square(
-        squareArgs[0],
-        squareArgs[1],
+        new Point(squareArgs[0], squareArgs[1]),
         squareArgs[2]
       );
       break;
     }
 
     if (!Shape2D.isValidShape2D(shape2DToReturn)) {
-      throw new InvalidShapeException("InvalidShapeException");
+      throw new InvalidShapeException(shape2DToReturn);
     }
     return shape2DToReturn;
-    
   }
 
-  public static int getIntInRangeFromInput(Scanner input, int min, int max)
-    throws NumberFormatException,
-           IntNotInRangeException {
-
-    String userInput = input.nextLine();
-    if (!isInteger(userInput)) {
-      throw new NumberFormatException();
-    }
-    int userInt = Integer.valueOf(userInput);
-    if (!isInRange(userInt, min, max)) {
-      throw new IntNotInRangeException();
+  public static int getIntInRangeFromInput(Scanner input, int min, int max) {
+    int userInt = getIntFromInput(input);
+    while (!isInRange(userInt, min, max)) {
+      System.out.printf(
+        "Integer not in range(%d-%d). Please enter again: ",
+        min,
+        max);
+      userInt = getIntFromInput(input);
     }
     return userInt;
+  }
+
+  public static int getIntFromInput(Scanner input) {
+    String userInput = input.nextLine();
+    while (!isInteger(userInput)) {
+      System.out.print("Expected an integer. Please enter again: ");
+      userInput = input.nextLine();
+    }
+    return Integer.valueOf(userInput);
   }
 
   public static String toNumberedString(String[] strings) {
@@ -644,38 +552,40 @@ class GeometryDrawingProgram {
     return (number >= min) && (number <= max);
   }
 
-
   public static class GeometryScreen {
     GeometryScreen(int width, int height) {
       frame = new JFrame("Geometry Drawing Program 1.0");
       
-      //Create a new "custom" panel for graphics based on the inner class below
       JPanel graphicsPanel = new GraphicsPanel();
       
-      //Add the panel and the frame to the window
       frame.getContentPane().add(graphicsPanel);
       
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       frame.setSize(width, height);
       frame.setResizable(false);
       frame.setUndecorated(false);
-      frame.setVisible(true);      
+      frame.setVisible(true);    
     } 
     
     @SuppressWarnings("serial")
-    //This is an inner class which contains all the details about drawing to screen.
+  //This is an inner class which contains all the details about drawing to screen.
     public static class GraphicsPanel extends JPanel {
       @Override
       public void paintComponent(Graphics g) {
+        int xOffset = this.getWidth()/2;
+        int yOffset = this.getHeight()/2;
+
         setDoubleBuffered(true);
         g.setColor(Color.BLACK);
 
         this.drawAxis(g);
         
         if (!shape2Ds.isEmpty()) {
+          g.translate(xOffset, yOffset);
           for(int i = 0; i < shape2Ds.size(); i++) {
             shape2Ds.get(i).draw((Graphics2D)g);
           }
+          g.translate(-xOffset, yOffset); // reset translations
         }
       }
 

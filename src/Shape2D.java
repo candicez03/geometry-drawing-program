@@ -30,9 +30,7 @@ public abstract class Shape2D implements Serializable, Drawable, Rotatable, Tran
 
   public abstract double calculatePerimeter();
   
-  public abstract void translateX(int value);
-
-  public abstract void translateY(int value);
+  public abstract void translate(int dx, int dy);
 
   public abstract void draw(Graphics2D g2d);
 

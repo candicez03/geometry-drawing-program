@@ -1,15 +1,6 @@
 import java.awt.Point;
 
 public class Triangle extends SimplePolygon {
-  public static final String[] PROMPTS = new String[] {
-    "x coordinate of point 1",
-    "y coordinate of point 1",
-    "x coordinate of point 2",
-    "y coordinate of point 2",
-    "x coordinate of point 3",
-    "y coordinate of point 3"
-  };
-
   /**
    *
    */

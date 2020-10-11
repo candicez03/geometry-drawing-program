@@ -1,14 +1,8 @@
+import java.awt.Point;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 public class Ellipse extends Shape2D {
-  public static final String[] PROMPTS = new String[] {
-    "x coordinate (top-left)",
-    "y coordinate (top-left)",
-    "width",
-    "height"
-  };
-
   /**
    *
    */
@@ -16,17 +10,17 @@ public class Ellipse extends Shape2D {
   
   private static final String TYPE = "ellipse";
 
-  private int x;
-  private int y;
+  private Point topLeft;
   private int width;
   private int height;
 
-  public Ellipse(int x, int y, int width, int height) {
+  public Ellipse(Point topLeft, int width, int height) {
     super();
-    this.x = x;
-    this.y = y;
+
+    this.topLeft = topLeft;
     this.width = width;
     this.height = height;
+
     this.updateArea();
     this.updatePerimeter();
   }
@@ -41,8 +35,8 @@ public class Ellipse extends Shape2D {
     // location: top left point of the square the circle is inscribed in
     String additionalInfo = String.format(
       "location: (%d, %d)\twidth: %d\theight: %d",
-      this.x,
-      this.y,
+      this.topLeft.x,
+      this.topLeft.y,
       this.width,
       this.height
     );
@@ -65,34 +59,29 @@ public class Ellipse extends Shape2D {
   }
 
   @Override
-  public void translateX(int value) {
-    this.x += value;
-  }
-
-  @Override
-  public void translateY(int value) {
-    this.y += value;
+  public void translate(int dx, int dy) {
+    this.topLeft.translate(dx, dy);
   }
 
   @Override
   public void draw(Graphics2D g2d) {
     if (this.getRotationAngle() == 0) {
-      g2d.drawOval(this.x, this.y, this.width, this.height);
+      g2d.drawOval(this.topLeft.x, this.topLeft.y, this.width, this.height);
       return;
     }
 
     AffineTransform transformCopy = g2d.getTransform();
-    g2d.rotate(Math.toRadians(-this.getRotationAngle()));
-    g2d.drawOval(this.x, this.y, this.width, this.height);
+    g2d.rotate(
+      Math.toRadians(this.getRotationAngle()),
+      this.topLeft.x,
+      this.topLeft.y
+    );
+    g2d.drawOval(this.topLeft.x, this.topLeft.y, this.width, this.height);
     g2d.setTransform(transformCopy);
   }
   
-  public int getX() {
-    return this.x;
-  }
-
-  public int getY() {
-    return this.y;
+  public Point getTopLeft() {
+    return this.topLeft;
   }
 
   public int getWidth() {

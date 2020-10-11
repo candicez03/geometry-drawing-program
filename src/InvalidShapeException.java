@@ -1,10 +1,12 @@
 @SuppressWarnings("serial")
 public class InvalidShapeException extends Exception {
-  public InvalidShapeException() {
+  Shape2D invalidShape;
+
+  public InvalidShapeException(Shape2D invalidShape) {
     super();
   }
-
-  public InvalidShapeException(String errorMsg) {
-    super(errorMsg);
+  
+  public Shape2D getInvalidShape() {
+    return this.invalidShape;
   }
 }

@@ -1,10 +1,6 @@
-public class Square extends Rectangle {
-  public static final String[] PROMPTS = new String[] {
-    "x coordinate (top-left)",
-    "y coordinate (top-left)",
-    "side length"
-  };
-  
+import java.awt.Point;
+
+public class Square extends Rectangle {  
   /**
    *
    */
@@ -12,8 +8,8 @@ public class Square extends Rectangle {
 
   private static final String TYPE = "square";
 
-  public Square(int x, int y, int sideLength) {
-    super(x, y, sideLength, sideLength);
+  public Square(Point topLeft, int sideLength) {
+    super(topLeft, sideLength, sideLength);
   }
 
   @Override
@@ -25,8 +21,8 @@ public class Square extends Rectangle {
   public String toString() {
     String additionalInfo = String.format(
       "location: (%d, %d)\tside length: %d",
-      this.getX(),
-      this.getY(),
+      this.getTopLeft().x,
+      this.getTopLeft().y,
       this.getHeight()
     );
     return super.toString() + "\n" + additionalInfo;

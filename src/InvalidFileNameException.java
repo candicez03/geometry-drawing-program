@@ -1,6 +1,13 @@
 @SuppressWarnings("serial")
 public class InvalidFileNameException extends Exception {
-  public InvalidFileNameException(String msg) {
-    super(msg);
+  private String fileName;
+  
+  public InvalidFileNameException(String fileName) {
+    super();
+    this.fileName = fileName;
+  }
+
+  public String getFileName() {
+    return this.fileName;
   }
 }

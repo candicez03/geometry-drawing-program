@@ -1,17 +1,6 @@
 import java.awt.Point;
 
 public class Quadrilateral extends SimplePolygon {
-  public static final String[] PROMPTS = new String[] {
-    "x coordinate of point 1",
-    "y coordinate of point 1",
-    "x coordinate of point 2",
-    "y coordinate of point 2",
-    "x coordinate of point 3",
-    "y coordinate of point 3",
-    "x coordinate of point 4",
-    "y coordinate of point 4"
-  };
-
   /**
    *
    */

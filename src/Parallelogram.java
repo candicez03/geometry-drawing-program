@@ -1,14 +1,6 @@
 import java.awt.Point;
 
 public class Parallelogram extends Quadrilateral {
-  public static final String[] PROMPTS = new String[] {
-    "x coordinate (top-left)",
-    "y coordinate (top-left)",
-    "x coordinate (bottom-left)",
-    "y coordinate (bottom-left)",
-    "base width"
-  };
-
   /**
    *
    */
