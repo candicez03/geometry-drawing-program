@@ -1,20 +1,25 @@
-package src.main.java;
-
 import java.awt.Point;
 
 public class SimplePolygon extends Polygon {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final String TYPE = "simple polygon";
 
   public SimplePolygon(Point... vertices) {
     super(vertices);
+    this.updateArea();
   }
 
+  @Override
   public double calculateArea() {
     double area = 0;
-    int[] xPoints = super.getXPoints();
-    int[] yPoints = super.getYPoints();
-    int numPoints = super.getXPoints().length;
-    
+    int[] xPoints = this.getXPoints();
+    int[] yPoints = this.getYPoints();
+    int numPoints = this.getXPoints().length;
     for (int i = 0; i < numPoints; i++) {
       int x1 = xPoints[i];
       int y1 = yPoints[i];

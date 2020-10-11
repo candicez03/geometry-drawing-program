@@ -1,14 +1,27 @@
-package src.main.java;
+import java.awt.Graphics2D;
+import java.io.Serializable;
 
-import java.awt.Graphics;
+public abstract class Shape2D implements Serializable, Drawable, Rotatable, Translatable {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-public abstract class Shape2D implements Drawable, Rotatable, Translatable {
   private int rotationAngle;
   private double area;
   private double perimeter;
 
   public Shape2D() {
     this.rotationAngle = 0;
+  }
+
+  public static boolean isValidShape2D(Shape2D shapeToCheck) {
+    if (shapeToCheck == null) {
+      return false;
+    }
+    shapeToCheck.updateArea();
+    shapeToCheck.updatePerimeter();
+    return (shapeToCheck.getArea() > 0) && (shapeToCheck.getPerimeter() > 0);
   }
 
   public abstract String getType();
@@ -21,14 +34,24 @@ public abstract class Shape2D implements Drawable, Rotatable, Translatable {
 
   public abstract void translateY(int value);
 
-  public abstract void draw(Graphics g);
+  public abstract void draw(Graphics2D g2d);
+
+  @Override
+  public String toString() {
+    return String.format(
+      "type: %s\tarea: %.2f\tperimeter: %.2f",
+      this.getType(),
+      this.getArea(),
+      this.getPerimeter()
+      );
+  }
 
   public void updateArea() {
     this.area = this.calculateArea();
   }
 
   public void updatePerimeter() {
-    this.perimeter = this.getPerimeter();
+    this.perimeter = this.calculatePerimeter();
   }
 
   public double getArea() {
@@ -48,6 +71,11 @@ public abstract class Shape2D implements Drawable, Rotatable, Translatable {
     this.validateRotationAngle();
   }
 
+  public void rotateClockwise(int angle) {
+    this.rotationAngle += angle;
+    this.validateRotationAngle();
+  }
+  
   private void validateRotationAngle() {
     if (this.rotationAngle >= 360) {
       this.rotationAngle = this.rotationAngle % 360;
