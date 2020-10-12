@@ -64,7 +64,7 @@ public abstract class Polygon extends Shape2D {
         this.yPoints[i]
       );
     }
-    return super.toString() + "\n" + additionalInfo;
+    return this.getBasicString() + "\n" + additionalInfo;
   }
 
   @Override
@@ -89,8 +89,13 @@ public abstract class Polygon extends Shape2D {
   
   @Override
   public void draw(Graphics2D g2d) {
+    int[] negatedYPoints = new int[this.yPoints.length];
+    for (int i = 0; i < this.yPoints.length; i++) {
+      negatedYPoints[i] = -this.yPoints[i];
+    }
+    
     if (this.getRotationAngle() == 0) {
-      g2d.drawPolygon(this.xPoints, this.yPoints, this.xPoints.length);
+      g2d.drawPolygon(this.xPoints, negatedYPoints, this.xPoints.length);
       return;
     }
 
@@ -100,7 +105,7 @@ public abstract class Polygon extends Shape2D {
       this.xPoints[0],
       this.yPoints[0]
     );
-    g2d.drawPolygon(this.xPoints, this.yPoints, this.xPoints.length);
+    g2d.drawPolygon(this.xPoints, negatedYPoints, this.xPoints.length);
     g2d.setTransform(transformCopy);
   }
 

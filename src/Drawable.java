@@ -13,7 +13,6 @@ import java.awt.Graphics2D;
 public interface Drawable {
   
   /**
-   * [draw]
    * Draws using a given {@code Graphics2D} object.
    * @param g2d The {@code Graphics2D} object used for drawing.
    */

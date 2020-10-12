@@ -49,6 +49,6 @@ public class Square extends Rectangle {
       this.getTopLeft().y,
       this.getHeight()
     );
-    return super.toString() + "\n" + additionalInfo;
+    return this.getBasicString() + "\n" + additionalInfo;
   }
 }

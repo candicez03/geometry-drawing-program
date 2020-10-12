@@ -53,7 +53,7 @@ public class Circle extends Ellipse {
       this.getTopLeft().y,
       this.getWidth()
     );
-    return super.toString() + "\n" + additionalInfo;
+    return this.getBasicString() + "\n" + additionalInfo;
   }
   
 }

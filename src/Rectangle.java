@@ -28,7 +28,7 @@ public class Rectangle extends Parallelogram {
   public Rectangle(Point topLeft, int width, int height) {
     super(
       topLeft,
-      new Point(topLeft.x, topLeft.y+height),
+      new Point(topLeft.x, topLeft.y-height),
       width
     );
     this.width = width;
@@ -63,7 +63,7 @@ public class Rectangle extends Parallelogram {
       this.width,
       this.height
     );
-    return super.toString() + "\n" + additionalInfo;
+    return this.getBasicString() + "\n" + additionalInfo;
   }
 
   @Override

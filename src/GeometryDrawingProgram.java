@@ -1,6 +1,10 @@
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import java.awt.Point;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Color;
 
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -25,7 +29,8 @@ import java.nio.file.Paths;
  */
 
 class GeometryDrawingProgram {
-  /** The frame used for geometry drawing. */
+
+  /** The file extension for saving. */
   public static final String FILE_EXTENSION = ".geo";
   /** The path to the folder for saving. */
   public static final String SAVING_FOLDER  = "saves/";
@@ -118,9 +123,11 @@ class GeometryDrawingProgram {
     "base width"
   };
 
+  /** The frame used for geometry drawing. */
+  public static JFrame frame = new JFrame();
+
   /** The list of 2d shapes to be drawn. */
   public static ArrayList<Shape2D> shapes;
-
 
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
@@ -130,10 +137,10 @@ class GeometryDrawingProgram {
     
     System.out.println("Welcome to Geometry Drawing Program 1.0!");
 
-    GeometryScreen geoScreen = new GeometryScreen(600, 600, shapes);
+    GeometryScreen geoScreen = new GeometryScreen(600, 600);
 
     do {
-      geoScreen.update(); //update the screen
+      frame.repaint(); //update the screen
 
       System.out.println("\n" + inputPromptMsg);
       printNumberedStrings(COMMANDS);
@@ -143,7 +150,7 @@ class GeometryDrawingProgram {
 
     } while(commandIdx != COMMANDS.length-1);
 
-    geoScreen.dispose();
+    frame.dispose();
     input.close();
   }
   
@@ -154,20 +161,12 @@ class GeometryDrawingProgram {
    * @param commandIdx  A command index referring to
    *                    the corresponding command in COMMANDS.
    */
+  @SuppressWarnings("unchecked")
   public static void handleCommand(Scanner input, int commandIdx) {
     switch(commandIdx) {
     // Display all Shapes to console
     case 0:
-      if (shapes.isEmpty()) {
-        System.out.println("There are currently no shapes in this drawing.");
-      } else {
-        for (int i = 0; i < shapes.size(); i++) {
-          System.out.printf(
-            "%d) %s\n",
-            i+1,
-            shapes.get(i).toString());
-        }
-      }
+      printShapesInfo();
       break;
 
     // Add a single Shape
@@ -182,21 +181,10 @@ class GeometryDrawingProgram {
 
     // Remove a single Shape
     case 2:
-      if (shapes.isEmpty()) {
-        System.out.println("There are currently no shapes in this drawing.");
-
-      } else {
-        String[] shapeStrings = new String[shapes.size()];
-        for (int i = 0; i < shapes.size(); i++) {
-          shapeStrings[i] = shapes.toString();
-        }
-        System.out.println("Displaying info of all shapes...");
-        printNumberedStrings(shapeStrings);
-        
-        System.out.print("Enter the index of the shape you would like to remove: ");
-        int idxToRemove = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
-        shapes.remove(idxToRemove);
-      }
+      printShapesInfo();
+      System.out.print("Enter the index of the shape you would like to remove: ");
+      int idxToRemove = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
+      shapes.remove(idxToRemove);
       break;
 
     // Translate a single Shape
@@ -205,11 +193,7 @@ class GeometryDrawingProgram {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
-        System.out.println("Displaying info of all shapes...");
-        for (Shape2D shape: shapes) {
-          System.out.println(shape.toString());
-        }
-
+        printShapesInfo();
         System.out.print("Enter the index of the shape you would like to translate: ");
         int idxToTranslate = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
         System.out.print("x value of translation: ");
@@ -227,11 +211,7 @@ class GeometryDrawingProgram {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
-        System.out.println("Displaying info of all shapes...");
-        for (Shape2D shape: shapes) {
-          System.out.println(shape.toString());
-        }
-
+        printShapesInfo();
         System.out.print("Enter the index of the shape you would like to rotate: ");
         int idxToRotate = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
         System.out.print("Enter the degree of rotation, clockwise: ");
@@ -300,8 +280,6 @@ class GeometryDrawingProgram {
         file.close();
         System.out.println("Successfully saved");
       
-      } catch (InvalidPathException e) {
-        System.out.println("e.getReason()");
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -352,9 +330,8 @@ class GeometryDrawingProgram {
    * a specific type of Shape2D object.
    * @param input The Scanner that will be used to take input.
    * @return      Shape2D, the generated Shape2D object using user input.
-   * @throws InvalidShapeException  Thrown when the generated Shape2D
-   *                                fails to meet the requirements
-   *                                of a valid shape.
+   * @throws InvalidShapeException  Thrown when the {@code Shape2D} created
+   *                                has an area or perimeter of 0.
    */
   public static Shape2D generateShape2DFromInput(Scanner input)
     throws InvalidShapeException {
@@ -411,14 +388,7 @@ class GeometryDrawingProgram {
 
         simplePolygonArgs[i] = new Point(x, y);
       }
-      try {
-        shape2DToReturn = new SimplePolygon(simplePolygonArgs);
-      } catch (IllegalArgumentException e) {
-        throw new InvalidShapeException(
-          "The given points do not form a simple polygon.",
-          shape2DToReturn
-        );
-      }
+      shape2DToReturn = new SimplePolygon(simplePolygonArgs);
       break;
 
     // triangle
@@ -544,8 +514,7 @@ class GeometryDrawingProgram {
 
     if (!Shape2D.isValidShape(shape2DToReturn)) {
       throw new InvalidShapeException(
-        "Invalid shape. The area/perimeter of the constructed shape is 0.",
-        shape2DToReturn
+        "Invalid shape. The area/perimeter of the constructed shape is not positive."
       );
     }
     return shape2DToReturn;
@@ -588,7 +557,25 @@ class GeometryDrawingProgram {
     return Integer.valueOf(userInput);
   }
 
-  
+  /** 
+   * Prints the information of each of the shapes
+   * in the static shapes array.
+   * <p>
+   * Format: "1. abc\n2. abc..."
+   */
+  public static void printShapesInfo() {
+    if (shapes.isEmpty()) {
+      System.out.println("There are currently no shapes in this drawing.");
+    } else {
+      String[] shapeStrings = new String[shapes.size()];
+      for (int i = 0; i < shapes.size(); i++) {
+        shapeStrings[i] = shapes.toString();
+      }
+      System.out.println("Displaying info of all shapes...");
+      printNumberedStrings(shapeStrings);
+    }
+  }
+
   /** 
    * Numbers and prints an array of Strings.
    * <p>
@@ -668,5 +655,96 @@ class GeometryDrawingProgram {
    */
   public static boolean isInRange(int number, int min, int max) {
     return (number >= min) && (number <= max);
+  }
+
+  /** 
+   * Draws a list of 2d shapes onto a screen.
+   * <p> created <b>2020.10.06</b>
+   * @version 1.0
+   * @author Candice Zhang
+   */
+  public static class GeometryScreen {
+    /** 
+     * Constructs a GeometryScreen with given width, height,
+     * and a list of Shape2D objects.
+     * @param width    The width of the screen.
+     * @param height   The height of the screen.
+     */
+    public GeometryScreen(int width, int height) {
+      frame = new JFrame("Geometry Drawing Program 1.0");
+      
+      JPanel graphicsPanel = new GraphicsPanel();
+      
+      frame.getContentPane().add(graphicsPanel);
+      
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      frame.setSize(width, height);
+      frame.setResizable(false);
+      frame.setUndecorated(false);
+      frame.setVisible(true);    
+    } 
+
+    /** 
+     * An inner class which contains all the details about drawing to screen.
+     * <p> created <b>2020.10.06</b>
+     * @version 1.0
+     * @author Candice Zhang
+     */
+    @SuppressWarnings("serial")
+    public class GraphicsPanel extends JPanel {
+      @Override
+      public void paintComponent(Graphics g) {
+        int xOffset = this.getWidth()/2;
+        int yOffset = this.getHeight()/2;
+
+        setDoubleBuffered(true);
+        g.setColor(Color.BLACK);
+
+        this.drawCartesianPlane(g);
+        
+        if (!shapes.isEmpty()) {
+          g.translate(xOffset, yOffset);
+          for(int i = 0; i < shapes.size(); i++) {
+            shapes.get(i).draw((Graphics2D)g);
+          }
+          g.translate(-xOffset, yOffset); // reset translations
+        }
+      }
+
+      /** 
+       * Draws the x and y axis and the cartesian plane grid
+       * onto the screen, using a given {@code Graphics} object.
+       * @param g The {@code Graphics} context in which to paint.
+       */
+      public void drawCartesianPlane(Graphics g) {
+        int width = this.getWidth();
+        int height = this.getHeight();
+
+        // white background
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, width, height);
+
+        // grid lines
+        g.setColor(new Color(225, 225, 225));
+        int gridSize = 10;
+        
+        int wGrids = width/2/gridSize;
+        for(int i = -wGrids; i < wGrids+1; i++) {
+          g.drawLine(width/2 + i*gridSize, 0, width/2 + i*gridSize, height);
+        }
+
+        int hGrids = height/2/gridSize;
+        for(int i = -hGrids; i < hGrids+1; i++) {
+          g.drawLine(0, height/2 + i*gridSize, width, height/2 + i*gridSize);
+        }
+
+        // axis
+        g.setColor(Color.BLACK);
+        g.drawLine(width/2, 0, width/2, height); // y-axis
+        g.drawLine(0, height/2, width, height/2); // x-axis
+
+        
+      }
+    }
   }
 }

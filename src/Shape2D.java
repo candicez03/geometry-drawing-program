@@ -87,7 +87,6 @@ public abstract class Shape2D implements Serializable, Drawable, Rotatable, Tran
    */
   public abstract void draw(Graphics2D g2d);
 
-  
   /** 
    * Returns a {@code String} representation of the {@code Shape2D}.
    * <p>
@@ -96,18 +95,27 @@ public abstract class Shape2D implements Serializable, Drawable, Rotatable, Tran
    */
   @Override
   public String toString() {
+    return this.getBasicString();
+  }
+
+  /** 
+   * Returns a basic {@code String} representation of the shape.
+   * <p>
+   * Includes: type, area, perimeter, rotation angle.
+   * @return String, a basic representation of the shape.
+   */
+  public String getBasicString() {
     return String.format(
       "type: %s\tarea: %.2f\tperimeter: %.2f\trotation angle: %d",
       this.getType(),
       this.getArea(),
       this.getPerimeter(),
       this.rotationAngle
-      );
+    );
   }
 
   /** 
    * Re-calculates the area of the {@code Shape2D} and set it as the area.
-   * @return String
    */
   public void updateArea() {
     this.area = this.calculateArea();
@@ -115,7 +123,6 @@ public abstract class Shape2D implements Serializable, Drawable, Rotatable, Tran
 
   /** 
    * Re-calculates the perimeter of the {@code Shape2D} and set it as the perimeter.
-   * @return String
    */
   public void updatePerimeter() {
     this.perimeter = this.calculatePerimeter();
@@ -123,7 +130,8 @@ public abstract class Shape2D implements Serializable, Drawable, Rotatable, Tran
 
   /** 
    * Rotates the {@code Shape2D} with the given angle, clockwise.
-   * @param angle
+   * @param angle The rotation angle to be added to the current angle,
+   *              in degrees, clockwise.
    */
   public void rotateClockwise(int angle) {
     this.rotationAngle += angle;
@@ -159,7 +167,8 @@ public abstract class Shape2D implements Serializable, Drawable, Rotatable, Tran
   
   /** 
    * Sets the the rotation angle of the {@code Shape2D}
-   * to a given value. Values <0 or >360 will be normalized.
+   * to a given value. Values {@code <0} or {@code >360} 
+   * will be normalized.
    * @param angle The new rotation angle of the {@code Shape2D}.
    */
   public void setRotationAngle(int angle) {

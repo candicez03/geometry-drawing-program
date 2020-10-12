@@ -5,6 +5,11 @@ import java.awt.Point;
  * that are connected by straight line segments.
  * <p>
  * A simple polygon has only one boundary, and it does not cross over itself.
+ * <p>
+ * Currently, this class does not verify whether the given points
+ * produces a simple or complex polygon.
+ * Therefore, the area calculation would be incorrect if the user constructs
+ * a complex polygon, while the perimeter calculation would still be correct.
  * @since 1.0
  * @version 1.0
  * @author Candice Zhang
@@ -20,25 +25,9 @@ public class SimplePolygon extends Polygon {
    * Constructs a new {@code SimplePolygon} with a given set of vertices.
    * @param vertices  A array of vertex points of the simple polygon.
    */
-  public SimplePolygon(Point... vertices) throws IllegalArgumentException {
+  public SimplePolygon(Point... vertices) {
     super(vertices);
-    if (!SimplePolygon.isSimplePolygon(vertices)) {
-      throw new IllegalArgumentException("The given points do not form a simple polygon.");
-    }
     this.updateArea();
-  }
-
-  /** 
-   * Checks if a given array of Points forms a simple polygon in its order.
-   * <p>
-   * A simple polygon has only one boundary, and it does not cross over itself.
-   * @param vertices  The array of Points to be checked.
-   * @return boolean, {@code true} if the array of points forms
-   * a simple polygon; {@code false} otherwise.
-   */
-  public static boolean isSimplePolygon(Point[] vertices) {
-    // TODO: finish
-    return true;
   }
   
   /** 
@@ -51,9 +40,6 @@ public class SimplePolygon extends Polygon {
     return SimplePolygon.TYPE;
   }
 
-  /** 
-   * @return double
-   */
   @Override
   public double calculateArea() {
     // Gauss's area formula
