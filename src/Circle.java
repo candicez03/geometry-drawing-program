@@ -8,6 +8,8 @@ import java.awt.Point;
  * @since 1.0
  * @version 1.0
  * @author Candice Zhang
+ * @see Ellipse
+ * @see Shape2D
  */
 
 public class Circle extends Ellipse {
@@ -21,6 +23,7 @@ public class Circle extends Ellipse {
    * @param topLeft   The top-left point of the square
    *                  the circle is inscribed in.
    * @param diameter  The diameter of the circle.
+   * @see java.awt.Point
    */
   public Circle(Point topLeft, int diameter) {
     super(topLeft, diameter, diameter);

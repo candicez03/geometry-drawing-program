@@ -83,7 +83,7 @@ public abstract class Shape2D implements Serializable, Drawable, Rotatable, Tran
   
   /** 
    * Draws the shape.
-   * @param g2d  the {@code Graphics2D} context in which to paint.
+   * @param g2d  The {@code Graphics2D} context in which to paint.
    */
   public abstract void draw(Graphics2D g2d);
 

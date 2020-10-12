@@ -1,9 +1,5 @@
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Color;
 import java.awt.Point;
 
 import java.util.Scanner;
@@ -19,21 +15,25 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
 /**
- * GeometryDrawingProgram
+ * An interactive program for drawing 2d geometry shapes.
+ * <p>
+ * This program interacts with the user in the console and
+ * draws 2d shapes on a separate screen.
+ * <p> created <b>2020.10.04</b>
  * @version 1.0
  * @author Candice Zhang
- * 2020.10.04
  */
 
 class GeometryDrawingProgram {
-  public static JFrame frame;
-  public static ArrayList<Shape2D> shapes;
-  
+  /** The frame used for geometry drawing. */
   public static final String FILE_EXTENSION = ".geo";
+  /** The path to the folder for saving. */
   public static final String SAVING_FOLDER  = "saves/";
+  /** A string that contains all the characters that are permitted to use in file names.*/
   public static final String LEGAL_FILENAME_CHARS =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.";
 
+  /** An array of all available commands.*/
   public static final String[] COMMANDS = new String[] {
     "Display all Shapes to console",
     "Add a single Shape",
@@ -47,6 +47,7 @@ class GeometryDrawingProgram {
     "Quit"
   };
 
+  /** An array of all constructible shapes.*/
   public static final String[] CONSTRUCTIBLE_SHAPES = new String[] {
     "ellipse",
     "circle",
@@ -60,6 +61,7 @@ class GeometryDrawingProgram {
     "square"
   };
 
+  /** An array of input prompts for an Ellipse object.*/
   public static final String[] PROMPTS_ELLIPSE = new String[] {
     "x (top-left)",
     "y (top-left)",
@@ -67,12 +69,14 @@ class GeometryDrawingProgram {
     "height"
   };
   
+  /** An array of input prompts for a Circle object.*/
   public static final String[] PROMPTS_CIRCLE = new String[] {
     "x (top-left)",
     "y (top-left)",
     "diameter",
   };
 
+  /** An array of input prompts for a Parallelogram object.*/
   public static final String[] PROMPTS_PARALLELOGRAM = new String[] {
     "x (top-left)",
     "y (top-left)",
@@ -81,6 +85,7 @@ class GeometryDrawingProgram {
     "base width"
   };
 
+  /** An array of input prompts for a Rectangle object.*/
   public static final String[] PROMPTS_RECTANGLE = new String[] {
     "x (top-left)",
     "y (top-left)",
@@ -88,6 +93,7 @@ class GeometryDrawingProgram {
     "height"
   };
 
+  /** An array of input prompts for a Rhombus object.*/
   public static final String[] PROMPTS_RHOMBUS = new String[] {
     "x (top-left)",
     "y (top-left)",
@@ -95,13 +101,14 @@ class GeometryDrawingProgram {
     "y (bottom-left)"
   };
 
+  /** An array of input prompts for a Square object.*/
   public static final String[] PROMPTS_SQUARE = new String[] {
     "x (top-left)",
     "y (top-left)",
     "side length"
   };
 
-  
+  /** An array of input prompts for a Trapezoid object.*/
   public static final String[] PROMPTS_TRAPEZOID = new String[] {
     "x (top-left)",
     "y (top-right)",
@@ -111,40 +118,41 @@ class GeometryDrawingProgram {
     "base width"
   };
 
-  
-  /** 
-   * @param args
-   */
+  /** The list of 2d shapes to be drawn. */
+  public static ArrayList<Shape2D> shapes;
+
+
   public static void main(String[] args) {
     Scanner input = new Scanner(System.in);
     shapes = new ArrayList<Shape2D>();
-    String menu_options = toNumberedString(COMMANDS);
     String inputPromptMsg = "Please enter an integer to select one of the options from the menu.";
     int commandIdx = -1;
     
     System.out.println("Welcome to Geometry Drawing Program 1.0!");
 
-    GeometryScreen geoScreen = new GeometryScreen(600, 600);
+    GeometryScreen geoScreen = new GeometryScreen(600, 600, shapes);
 
     do {
-      frame.repaint(); //update the screen
+      geoScreen.update(); //update the screen
 
       System.out.println("\n" + inputPromptMsg);
-      System.out.println(menu_options);
+      printNumberedStrings(COMMANDS);
       
       commandIdx = getIntInRangeFromInput(input, 1, COMMANDS.length) - 1;
       handleCommand(input, commandIdx);
 
     } while(commandIdx != COMMANDS.length-1);
 
-    frame.dispose();
+    geoScreen.dispose();
     input.close();
   }
   
   
   /** 
-   * @param input
-   * @param commandIdx
+   * Handles a command according to the given command index.
+   * @param input       The Scanner that will be used to take input.
+   * @param commandIdx  A command index referring to
+   *                    the corresponding command in COMMANDS.
    */
   public static void handleCommand(Scanner input, int commandIdx) {
     switch(commandIdx) {
@@ -178,10 +186,13 @@ class GeometryDrawingProgram {
         System.out.println("There are currently no shapes in this drawing.");
 
       } else {
-        System.out.println("Displaying info of all shapes...");
-        for (Shape2D shape: shapes) {
-          System.out.println(shape.toString());
+        String[] shapeStrings = new String[shapes.size()];
+        for (int i = 0; i < shapes.size(); i++) {
+          shapeStrings[i] = shapes.toString();
         }
+        System.out.println("Displaying info of all shapes...");
+        printNumberedStrings(shapeStrings);
+        
         System.out.print("Enter the index of the shape you would like to remove: ");
         int idxToRemove = getIntInRangeFromInput(input, 1, shapes.size()) - 1;
         shapes.remove(idxToRemove);
@@ -337,18 +348,21 @@ class GeometryDrawingProgram {
 
   
   /** 
-   * @param input
-   * @return Shape2D
-   * @throws InvalidShapeException
+   * Asks the user for relevant data to generate
+   * a specific type of Shape2D object.
+   * @param input The Scanner that will be used to take input.
+   * @return      Shape2D, the generated Shape2D object using user input.
+   * @throws InvalidShapeException  Thrown when the generated Shape2D
+   *                                fails to meet the requirements
+   *                                of a valid shape.
    */
   public static Shape2D generateShape2DFromInput(Scanner input)
     throws InvalidShapeException {
 
     Shape2D shape2DToReturn = null;
-    String shape2DOptionsMsg = toNumberedString(CONSTRUCTIBLE_SHAPES);
 
     System.out.println("Please select one of the shapes to generate:");
-    System.out.println(shape2DOptionsMsg);
+    printNumberedStrings(CONSTRUCTIBLE_SHAPES);
     
     int shapeTypeIdx = getIntInRangeFromInput(input, 1, CONSTRUCTIBLE_SHAPES.length) - 1;
     
@@ -539,10 +553,13 @@ class GeometryDrawingProgram {
 
   
   /** 
-   * @param input
-   * @param min
-   * @param max
-   * @return int
+   * Asks the user for an integer in a specified range
+   * and returns the integer.
+   * @param input   The Scanner that will be used to take input.
+   * @param min     The minimum accepted value for the integer.
+   * @param max     The maximum accepted value for the integer.
+   * @return        int, an integer taken from the input that is
+   *                within the given range.
    */
   public static int getIntInRangeFromInput(Scanner input, int min, int max) {
     int userInt = getIntFromInput(input);
@@ -558,8 +575,9 @@ class GeometryDrawingProgram {
 
   
   /** 
-   * @param input
-   * @return int
+   * Asks the user for an integer and returns the integer.
+   * @param input   The Scanner that will be used to take input.
+   * @return        int, an integer taken from the input.
    */
   public static int getIntFromInput(Scanner input) {
     String userInput = input.nextLine();
@@ -572,17 +590,27 @@ class GeometryDrawingProgram {
 
   
   /** 
-   * @param strings
-   * @return String
+   * Numbers and prints an array of Strings.
+   * <p>
+   * Format: "1. abc\n2. abc..."
+   * @param strings  The array of strings to be numbered.
    */
-  public static String toNumberedString(String[] strings) {
-    String result = "";
+  public static void printNumberedStrings(String[] strings) {
     for (int i = 0; i < strings.length; i++) {
-      result += Integer.toString(i+1) + ". " + strings[i] + "\n";
+      System.out.println(Integer.toString(i+1) + ". " + strings[i]);
     }
-    return result.trim();
   }
 
+  /** 
+   * Checks if the given file name only contains
+   * legal/permitted characters.
+   * <p>
+   * Permitted characters:
+   * "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-."
+   * @param fileName  The file name to be checked.
+   * @return boolean, true if the given file name only contains
+   *         legal/permitted characters; false otherwise.
+   */
   public static boolean isLegalFileName(String fileName) {
     for (int i = 0; i < fileName.length(); i++) {
       String cur = fileName.substring(i, i+1);
@@ -594,8 +622,11 @@ class GeometryDrawingProgram {
   }
 
   /** 
-   * @param str
-   * @return boolean
+   * Checks if the given string only contains
+   * an integer.
+   * @param str  The string to be checked.
+   * @return boolean, true if the given string only contains
+   *         an integer; false otherwise.
    */
   public static boolean isInteger(String str) {
     if (str == null) {
@@ -626,58 +657,16 @@ class GeometryDrawingProgram {
 
   
   /** 
-   * @param number
-   * @param min
-   * @param max
-   * @return boolean
+   * Checks if the given integer is within a specified range.
+   * <p>
+   * Range bounds are inclusive.
+   * @param number  The number to be checked.
+   * @param min     The minimum value of the range.
+   * @param max     The maximum value of the range.
+   * @return        boolean, true if the given integer is
+   *                within a specified range; false otherwise.
    */
   public static boolean isInRange(int number, int min, int max) {
     return (number >= min) && (number <= max);
-  }
-
-  public static class GeometryScreen {
-    GeometryScreen(int width, int height) {
-      frame = new JFrame("Geometry Drawing Program 1.0");
-      
-      JPanel graphicsPanel = new GraphicsPanel();
-      
-      frame.getContentPane().add(graphicsPanel);
-      
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.setSize(width, height);
-      frame.setResizable(false);
-      frame.setUndecorated(false);
-      frame.setVisible(true);    
-    } 
-    
-    @SuppressWarnings("serial")
-  //This is an inner class which contains all the details about drawing to screen.
-    public static class GraphicsPanel extends JPanel {
-      @Override
-      public void paintComponent(Graphics g) {
-        int xOffset = this.getWidth()/2;
-        int yOffset = this.getHeight()/2;
-
-        setDoubleBuffered(true);
-        g.setColor(Color.BLACK);
-
-        this.drawAxis(g);
-        
-        if (!shapes.isEmpty()) {
-          g.translate(xOffset, yOffset);
-          for(int i = 0; i < shapes.size(); i++) {
-            shapes.get(i).draw((Graphics2D)g);
-          }
-          g.translate(-xOffset, yOffset); // reset translations
-        }
-      }
-
-      public void drawAxis(Graphics g) {
-        int width = this.getWidth();
-        int height = this.getHeight();
-        g.drawLine(width/2, 0, width/2, height); // y-axis
-        g.drawLine(0, height/2, width, height/2); // x-axis
-      }
-    }
   }
 }

@@ -10,6 +10,7 @@ import java.awt.geom.AffineTransform;
  * @since 1.0
  * @version 1.0
  * @author Candice Zhang
+ * @see Shape2D
  */
 
 public class Ellipse extends Shape2D {
@@ -31,6 +32,7 @@ public class Ellipse extends Shape2D {
    *                  the ellipse is inscribed in.
    * @param width     The width of the circle.
    * @param height    The height of the circle.
+   * @see java.awt.Point
    */
   public Ellipse(Point topLeft, int width, int height) {
     super();
@@ -117,6 +119,7 @@ public class Ellipse extends Shape2D {
    * Returns the top-left point of the rectangle
    * this ellipse is inscribed in. 
    * @return Point, the top-left point.
+   * @see java.awt.Point
    */
   public Point getTopLeft() {
     return this.topLeft;
