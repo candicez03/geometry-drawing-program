@@ -4,12 +4,10 @@ import java.awt.Point;
  * Represents a circle by its diameter and
  * the top-left point of the square
  * it is inscribed in.
- * <p> created <b>2020-10-05</b>
+ * <p> created <b>2020.10.05</b>
  * @since 1.0
  * @version 1.0
  * @author Candice Zhang
- * @see Ellipse
- * @see Shape2D
  */
 
 public class Circle extends Ellipse {
@@ -23,7 +21,6 @@ public class Circle extends Ellipse {
    * @param topLeft   The top-left point of the square
    *                  the circle is inscribed in.
    * @param diameter  The diameter of the circle.
-   * @see java.awt.Point
    */
   public Circle(Point topLeft, int diameter) {
     super(topLeft, diameter, diameter);
